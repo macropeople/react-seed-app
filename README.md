@@ -36,15 +36,23 @@ Services can be created programmagically using the code below.
 ```
 filename ft15f001 temp;
 parmcards4;
-    * enter sas backend code below ;
-    data example1 example2;
-      set sashelp.class;
-    run;
-    %webout(ARR,example1) * Array format, fast, suitable for large tables ;
-    %webout(OBJ,example2) * Object format, easier to work with ;
+    proc sql;
+    create table areas as select distinct area
+      from sashelp.springs;
+    %webout(OBJ,areas)
     %webout(CLOSE)
 ;;;;
-%mv_createwebservice(path=/Public/myapp, name=testJob, code=ft15f001)
+%mv_createwebservice(path=/Public/myapp/common, name=appInit, code=ft15f001,replace=YES)
+
+filename ft15f001 temp;
+parmcards4;
+    proc sql;
+    create table springs as select * from sashelp.springs
+      where area in (select area from areas);
+    %webout(OBJ,springs)
+    %webout(CLOSE)
+;;;;
+%mv_createwebservice(path=/Public/myapp/common, name=getData, code=ft15f001,replace=YES)
 ```
 
 ## Frontend Web
