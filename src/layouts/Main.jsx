@@ -36,8 +36,8 @@ const useStyles = makeStyles(theme => ({
     cursor: "pointer"
   },
   title: {
-    flexGrow: 1,
-    color: "white"
+    color: "white",
+    padding: "0 8px"
   }
 }));
 
@@ -61,12 +61,29 @@ const Main = props => {
     <div className={classes.root}>
       <AppBar position="static">
         <Toolbar variant="dense">
+          <img
+            src="logo-white.png"
+            alt="logo"
+            style={{ width: "2%", cursor: "pointer" }}
+            onClick={() => props.history.push("/home")}
+          />
           <Typography variant="h6" className={classes.title}>
-            <Link to="/homepage" className={classes.companyTitle}>
+            <Link to="/home" className={classes.companyTitle}>
               Home
             </Link>
           </Typography>
-          <div>
+          <Typography variant="h6" className={classes.title}>
+            <Link to="/demo" className={classes.companyTitle}>
+              Demo
+            </Link>
+          </Typography>
+          <div
+            style={{
+              display: "flex",
+              flexGrow: "1",
+              justifyContent: "flex-end"
+            }}
+          >
             <Username
               userName={getUserName()}
               onClickHandler={handleMenu}
