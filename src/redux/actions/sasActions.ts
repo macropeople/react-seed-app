@@ -52,7 +52,7 @@ export function execStartUp() {
         dispatch(loadStartUp(payload));
         if (res.login === false) {
           // try commneting this block
-          dispatch(push(`homepage`));
+          dispatch(push(`home`));
         }
       })
       .catch(e => {
