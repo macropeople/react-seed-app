@@ -1,5 +1,5 @@
 import React from "react";
-import { Route, HashRouter } from "react-router-dom";
+import { Route, HashRouter, Redirect } from "react-router-dom";
 import HomePageComponent from "../components/home-page.component";
 import AboutPageComponent from "../components/about-page.component";
 import LoginPageComponent from "../components/login-page.component";
@@ -20,14 +20,16 @@ export default (
         path="/login"
         component={requireNoAuthentication(LoginPageComponent)}
       />
-      <Route
+      <Route exact path="/" component={() => <Redirect to="/home" />} />
+      <RouteWithLayout
         exact
-        path="/homepage"
+        path="/home"
+        layout={requireAuthentication(MainLayout)}
         component={HomePageComponent}
       />
       <RouteWithLayout
         exact
-        path="/"
+        path="/demo"
         layout={requireAuthentication(MainLayout)}
         component={DataPageComponent}
       />
