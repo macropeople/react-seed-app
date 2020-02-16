@@ -13,5 +13,8 @@ export default function configureStore(preloadedState?: any) {
     preloadedState,
     composeEnhancer(applyMiddleware(routerMiddleware(history), thunk))
   );
+  createdStore = store;
   return store;
 }
+
+export let createdStore;

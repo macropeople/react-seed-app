@@ -1,8 +1,9 @@
 import SASjs from "sasjs";
 import { push } from "connected-react-router";
 import cachedData from '../../cached_data';
+import { createdStore } from './../store';
 const sasService = new SASjs({
-  baseURL: " ",
+  baseURL: "",
   port: null,
   pathSAS9: "/SASStoredProcess/do",
   pathSASViya: "/SASJobExecution",
@@ -64,8 +65,14 @@ export function execStartUp() {
 export function execSASRequest(programName, data) {
   return new Promise((resolve, reject) => {
     sasService
-      .request(programName, data, undefined)
+      .request(programName, data)
       .then((res: any) => {
+        console.log(res);
+
+        if (res.login === false) {
+          createdStore.dispatch(LOGOUT());
+        }
+
         resolve(res);
       })
       .catch(e => {
