@@ -103,9 +103,9 @@ class LoginPageComponent extends React.Component<any, MyState> {
   render() {
     const classes = (this.props as any).classes;
     return (
-      <Container component="main" maxWidth="xs">
+      <Container component="main" maxWidth="xs" className="login-page">
         <CssBaseline />
-        <div className={classes.paper + " col-flex"}>
+        <div className={classes.paper + " col-flex" + " LoginPageComponent"}>
           <div>
             <img
               className="base-logo"

@@ -5,7 +5,8 @@ const initialState: any = {
   userLogged: null,
   startupLoaded: false,
   debug_reqs: [],
-  failed_reqs: []
+  failed_reqs: [],
+  requestWaiting: {}
 };
 
 const sasReducer = (state = initialState, action: any) => {
@@ -20,12 +21,20 @@ const sasReducer = (state = initialState, action: any) => {
           service: action.payload.service
         };
       } else {
-        newState = {
-          startupLoaded: true,
-          startupData: action.payload.data,
-          userLogged: true,
-          service: action.payload.service
-        };
+        if (Object.entries(state.startupData).length === 0 && state.startupData.constructor === Object) {
+          newState = {
+            startupLoaded: true,
+            startupData: action.payload.data,
+            userLogged: true,
+            service: action.payload.service
+          };
+        } else {
+          newState = {
+            startupLoaded: true,
+            userLogged: true,
+            service: action.payload.service
+          };
+        }
       }
       if (action.payload.service) {
         newState["debugLogs"] = action.payload.service.debugLogs;
@@ -37,6 +46,11 @@ const sasReducer = (state = initialState, action: any) => {
         startupData: {},
         userLogged: false
       });
+    case "SESSION_EXPIRED":
+      console.log(state);
+      return Object.assign({}, state, {
+        userLogged: false
+      });
     case "UPDATE_SERVICE":
       return Object.assign({}, state, {
         service: action.payload
@@ -45,6 +59,10 @@ const sasReducer = (state = initialState, action: any) => {
       return Object.assign({}, state, {
         debugLogs: action.payload
       });
+    case "SAVE_REQUEST":
+      return Object.assign({}, state, {
+        requestWaiting: action.payload
+      })
     default:
       return state;
   }

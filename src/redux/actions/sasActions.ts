@@ -24,6 +24,15 @@ export const LOGOUT = () => ({
   type: "LOGOUT"
 });
 
+const SESSION_EXPIRED = () => ({
+  type: "SESSION_EXPIRED"
+});
+
+const SAVE_REQUEST = payload => ({
+  type: "SAVE_REQUEST",
+  payload: payload
+});
+
 export const updateDebugCheckBox = payload => {
   sasService.debugState = payload;
 
@@ -33,27 +42,43 @@ export const updateDebugCheckBox = payload => {
   };
 };
 
+
+
 export function execStartUp() {
   return (dispatch, state) => {
     sasService
       .request("common/appInit", null, true)
       .then((res: any) => {
+        console.log("STARTUP LOADED", res);
+
         let jsonResponse;
-        try {
-          jsonResponse = JSON.parse(res);
-        } catch (e) {
-          console.log(e);
+
+        if (res.login === false) {
+          jsonResponse = res;
+        } else {
+          try {
+            jsonResponse = JSON.parse(res);
+          } catch (e) {
+            console.log(e);
+          }
         }
+
+        let startupData = res;
 
         if (jsonResponse) {
-          cachedData.areas = jsonResponse.data.areas;
-        }
+          let payload;
 
-        let payload = { service: sasService, data: res };
-        dispatch(loadStartUp(payload));
-        if (res.login === false) {
-          // try commneting this block
-          dispatch(push(`home`));
+          if (jsonResponse.login === false) {
+            payload = { service: sasService, data: jsonResponse };
+          } else {
+            startupData = jsonResponse.data;
+
+            if (jsonResponse.data) {
+              payload = { service: sasService, data: startupData };
+            }
+          }
+
+          dispatch(loadStartUp(payload));
         }
       })
       .catch(e => {
@@ -70,7 +95,11 @@ export function execSASRequest(programName, data) {
         console.log(res);
 
         if (res.login === false) {
-          createdStore.dispatch(LOGOUT());
+          createdStore.dispatch(SAVE_REQUEST({
+            programName: programName,
+            data: data
+          }));
+          createdStore.dispatch(SESSION_EXPIRED());
         }
 
         resolve(res);

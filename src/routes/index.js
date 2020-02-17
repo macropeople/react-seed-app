@@ -15,11 +15,11 @@ import theme from "../theme";
 export default (
   <ThemeProvider theme={theme}>
     <HashRouter>
-      <Route
+      {/* <Route
         exact
         path="/login"
         component={requireNoAuthentication(LoginPageComponent)}
-      />
+      /> */}
       <Route exact path="/" component={() => <Redirect to="/home" />} />
       <RouteWithLayout
         exact

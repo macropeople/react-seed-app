@@ -71,3 +71,23 @@
     cursor: pointer;
   }
 }
+
+.login-page {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw !important;
+    max-width: unset !important;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    background: #000000a6;
+
+    .LoginPageComponent {
+      background: white;
+      padding: 30px 30px;
+      max-width: 400px;
+      border-radius: 3px;
+    }
+}

@@ -11,6 +11,7 @@ import TableContainer from "@material-ui/core/TableContainer";
 import TableHead from "@material-ui/core/TableHead";
 import TableRow from "@material-ui/core/TableRow";
 import Paper from "@material-ui/core/Paper";
+import { connect } from "react-redux";
 
 import cachedData from '../cached_data';
 
@@ -30,9 +31,10 @@ class DataPageComponent extends React.Component<any, any> {
     }
     async componentDidMount() {
         let areas = null;
+        console.log(this.props);
 
-        if (cachedData.areas) {
-            areas = cachedData.areas;
+        if (this.props.startupData.areas) {
+            areas = this.props.startupData.areas;
         } else {
             let res: any = await execSASRequest("/common/appInit", null);
 
@@ -159,4 +161,14 @@ class DataPageComponent extends React.Component<any, any> {
     }
 }
 
-export default DataPageComponent;
+const mapStateToProps = (state: any) => {
+    return { startupData: state.sasData.startupData };
+};
+
+// const mapDispatchToProps = dispatch => ({
+//     loadStartUp: payload => dispatch(loadStartUp(payload))
+// });
+
+export default connect(
+    mapStateToProps
+)(DataPageComponent);
