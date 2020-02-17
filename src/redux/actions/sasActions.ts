@@ -6,8 +6,8 @@ const sasService = new SASjs({
   port: null,
   pathSAS9: "/SASStoredProcess/do",
   pathSASViya: "/SASJobExecution",
-  programRoot: "/Public/m2",
-  appLoc: "SASVIYA"
+  appLoc: "/Public/m2",
+  serverType: "SASVIYA"
 });
 
 export const loadStartUp = payload => {
