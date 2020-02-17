@@ -2,11 +2,11 @@ import SASjs from "sasjs";
 import { push } from "connected-react-router";
 import cachedData from '../../cached_data';
 const sasService = new SASjs({
-  baseURL: " ",
+  serverUrl: "",
   port: null,
   pathSAS9: "/SASStoredProcess/do",
   pathSASViya: "/SASJobExecution",
-  programRoot: "/Public/m2",
+  appLoc: "/Public/m2",
   serverType: "SASVIYA"
 });
 

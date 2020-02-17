@@ -1,6 +1,6 @@
-import React from "react";
+import React, { useState } from "react";
 
-import { makeStyles } from "@material-ui/styles";
+import { makeStyles, withStyles } from "@material-ui/styles";
 import Typography from "@material-ui/core/Typography";
 import Dialog from "@material-ui/core/Dialog";
 import DialogContent from "@material-ui/core/DialogContent";
@@ -10,6 +10,52 @@ import ExpansionPanelDetails from "@material-ui/core/ExpansionPanelDetails";
 import ExpansionPanelSummary from "@material-ui/core/ExpansionPanelSummary";
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
 import Grid from "@material-ui/core/Grid";
+
+import Paper from '@material-ui/core/Paper';
+import Tabs from '@material-ui/core/Tabs';
+import Tab from '@material-ui/core/Tab';
+
+const AntTabs = withStyles({
+  root: {
+    borderBottom: '1px solid #e8e8e8',
+  },
+  indicator: {
+    backgroundColor: '#1890ff',
+  },
+})(Tabs);
+
+const AntTab = withStyles(theme => ({
+  root: {
+    textTransform: 'none',
+    minWidth: 72,
+    fontWeight: theme.typography.fontWeightRegular,
+    marginRight: theme.spacing(4),
+    fontFamily: [
+      '-apple-system',
+      'BlinkMacSystemFont',
+      '"Segoe UI"',
+      'Roboto',
+      '"Helvetica Neue"',
+      'Arial',
+      'sans-serif',
+      '"Apple Color Emoji"',
+      '"Segoe UI Emoji"',
+      '"Segoe UI Symbol"',
+    ].join(','),
+    '&:hover': {
+      color: '#40a9ff',
+      opacity: 1,
+    },
+    '&$selected': {
+      color: '#1890ff',
+      fontWeight: theme.typography.fontWeightMedium,
+    },
+    '&:focus': {
+      color: '#40a9ff',
+    },
+  },
+  selected: {},
+}))(props => <Tab disableRipple {...props} />);
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -42,9 +88,12 @@ const useStyles = makeStyles(theme => ({
     color: "#3f51b5"
   },
   expansionDescription: {
-    backgroundColor: "#e8e8e8",
+    backgroundColor: '#fbfbfb',
+    border: '1px solid #e2e2e2',
+    borderRadius: '3px',
     minHeight: "50px",
     padding: "10px",
+    boxSizing: 'border-box',
     whiteSpace: "pre-wrap",
     fontFamily: "Monaco, Courier, monospace",
     position: "relative",
@@ -55,6 +104,9 @@ const useStyles = makeStyles(theme => ({
     [theme.breakpoints.up("md")]: {
       fontSize: theme.typography.pxToRem(16)
     }
+  },
+  programlogWrapper: {
+    padding: '20px'
   }
 }));
 
@@ -62,9 +114,14 @@ const RequestModal = props => {
   const { programLogs, sasjsConfig, isModalOpen, handleClose, open } = props;
   const classes = useStyles();
   const [expanded, setExpanded] = React.useState(false);
+  const [currentTab, setTab] = React.useState(0);
 
   const handleChange = panel => (event, isExpanded) => {
     setExpanded(isExpanded ? panel : false);
+  };
+
+  const handleTabChange = (event, newValue) => {
+    setTab(newValue);
   };
 
   let revealModal = null;
@@ -111,8 +168,8 @@ const RequestModal = props => {
                       >
                         {programLog.timestamp.format
                           ? programLog.timestamp.format(
-                              "dddd, MMMM Do YYYY, h:mm:ss a"
-                            )
+                            "dddd, MMMM Do YYYY, h:mm:ss a"
+                          )
                           : programLog.timestamp}
                         {programLog.timestamp.format
                           ? ` (${programLog.timestamp.fromNow()})`
@@ -121,74 +178,56 @@ const RequestModal = props => {
                     </Grid>
                   </Grid>
                 </ExpansionPanelSummary>
-                <ExpansionPanelDetails className={classes.expansionText}>
-                  <ExpansionPanel>
-                    <ExpansionPanelSummary
-                      expandIcon={<ExpandMoreIcon />}
-                      aria-controls={`$sas-log-{index}`}
-                      id={`$sas-log-{index}`}
+                <AntTabs
+                  value={currentTab}
+                  onChange={handleTabChange}
+                  indicatorColor="primary"
+                  textColor="primary"
+                  centered
+                >
+                  <AntTab label="SAS Log" />
+                  <AntTab label="SAS Source Code" />
+                  <AntTab label="SAS Generated Code" />
+                </AntTabs>
+
+                {currentTab === 0 ?
+                  <div className={classes.programlogWrapper}>
+                    <Typography
+                      variant="h5"
+                      className={classes.expansionDescription}
                     >
-                      <Typography
-                        variant="h3"
-                        className={classes.headingTextExpansion}
-                      >
-                        SAS Log
-                      </Typography>
-                    </ExpansionPanelSummary>
-                    <ExpansionPanelDetails>
-                      <Typography
-                        variant="h5"
-                        className={classes.expansionDescription}
-                      >
-                        {programLog.logLink}
-                      </Typography>
-                    </ExpansionPanelDetails>
-                  </ExpansionPanel>
-                  <ExpansionPanel>
-                    <ExpansionPanelSummary
-                      expandIcon={<ExpandMoreIcon />}
-                      aria-controls={`$sas-code-{index}`}
-                      id={`$sas-code-{index}`}
+                      {programLog.logLink}
+                    </Typography>
+                  </div>
+                  :
+                  ''
+                }
+
+                {currentTab === 1 ?
+                  <div className={classes.programlogWrapper}>
+                    <Typography
+                      variant="h5"
+                      className={classes.expansionDescription}
                     >
-                      <Typography
-                        variant="h3"
-                        className={classes.headingTextExpansion}
-                      >
-                        SAS Source Code
-                      </Typography>
-                    </ExpansionPanelSummary>
-                    <ExpansionPanelDetails>
-                      <Typography
-                        variant="h5"
-                        className={classes.expansionDescription}
-                      >
-                        {programLog.sourceCode}
-                      </Typography>
-                    </ExpansionPanelDetails>
-                  </ExpansionPanel>
-                  <ExpansionPanel>
-                    <ExpansionPanelSummary
-                      expandIcon={<ExpandMoreIcon />}
-                      aria-controls={`$sas-code-{index}`}
-                      id={`$sas-code-{index}`}
+                      {programLog.sourceCode}
+                    </Typography>
+                  </div>
+                  :
+                  ''
+                }
+
+                {currentTab === 2 ?
+                  <div className={classes.programlogWrapper}>
+                    <Typography
+                      variant="h5"
+                      className={classes.expansionDescription}
                     >
-                      <Typography
-                        variant="h3"
-                        className={classes.headingTextExpansion}
-                      >
-                        SAS Generated Code
-                      </Typography>
-                    </ExpansionPanelSummary>
-                    <ExpansionPanelDetails>
-                      <Typography
-                        variant="h5"
-                        className={classes.expansionDescription}
-                      >
-                        {programLog.generatedCode}
-                      </Typography>
-                    </ExpansionPanelDetails>
-                  </ExpansionPanel>
-                </ExpansionPanelDetails>
+                      {programLog.generatedCode}
+                    </Typography>
+                  </div>
+                  :
+                  ''
+                }
               </ExpansionPanel>
             ))}
           </div>
