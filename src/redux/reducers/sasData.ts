@@ -21,7 +21,10 @@ const sasReducer = (state = initialState, action: any) => {
           service: action.payload.service
         };
       } else {
-        if (Object.entries(state.startupData).length === 0 && state.startupData.constructor === Object) {
+        if (
+          Object.entries(state.startupData).length === 0 &&
+          state.startupData.constructor === Object
+        ) {
           newState = {
             startupLoaded: true,
             startupData: action.payload.data,
@@ -62,7 +65,7 @@ const sasReducer = (state = initialState, action: any) => {
     case "SAVE_REQUEST":
       return Object.assign({}, state, {
         requestWaiting: action.payload
-      })
+      });
     default:
       return state;
   }

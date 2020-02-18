@@ -10,7 +10,7 @@ import { withStyles } from "@material-ui/core/styles";
 import Container from "@material-ui/core/Container";
 import CircularProgress from "@material-ui/core/CircularProgress";
 import { connect } from "react-redux";
-import { loadStartUp } from "../redux/actions/sasActions";
+import { loadStartUp, LOGOUT } from "../redux/actions/sasActions";
 
 const styles = theme => ({
   "@global": {
@@ -57,6 +57,7 @@ class LoginPageComponent extends React.Component<any, MyState> {
       password: "",
       loading: false
     };
+    props.logOut();
   }
   signIn = () => {
     const self = this;
@@ -67,20 +68,20 @@ class LoginPageComponent extends React.Component<any, MyState> {
     );
     jqXhr
       .then(
-        function (res) {
+        function(res) {
           console.log(res);
 
-          if (res.search(/success/gmi)) {
+          if (res.search(/success/gim)) {
             let payload = { service: self.props.sasService, data: res };
             self.props.loadStartUp(payload);
             self.props.history.push("/");
           } else {
-            if (res.search(/error/gmi)) {
+            if (res.search(/error/gim)) {
               self.setState({ loading: false });
             }
           }
         },
-        function (err) {
+        function(err) {
           console.log(err);
           self.setState({ loading: false });
         }
@@ -105,7 +106,7 @@ class LoginPageComponent extends React.Component<any, MyState> {
     return (
       <Container component="main" maxWidth="xs" className="login-page">
         <CssBaseline />
-        <div className={classes.paper + " col-flex" + " LoginPageComponent"}>
+        <div className={`${classes.paper} col-flex LoginPageComponent`}>
           <div>
             <img
               className="base-logo"
@@ -165,8 +166,8 @@ class LoginPageComponent extends React.Component<any, MyState> {
                   className={classes.buttonProgress}
                 />
               ) : (
-                  "Sign In"
-                )}
+                "Sign In"
+              )}
             </Button>
           </form>
         </div>
@@ -181,6 +182,7 @@ const mapStateToProps = (state: any) => {
 };
 
 const mapDispatchToProps = dispatch => ({
+  logOut: () => dispatch(LOGOUT()),
   loadStartUp: payload => dispatch(loadStartUp(payload))
 });
 

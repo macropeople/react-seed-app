@@ -1,6 +1,4 @@
-import SASjs from "sasjs";
-import { push } from "connected-react-router";
-import cachedData from "../../cached_data";
+import SASjs, { SASjsConfig } from "sasjs";
 import { createdStore } from "./../store";
 const sasService = new SASjs({
   serverUrl: "",
@@ -8,11 +6,12 @@ const sasService = new SASjs({
   pathSAS9: "/SASStoredProcess/do",
   pathSASViya: "/SASJobExecution",
   appLoc: "/Public/m2",
-  serverType: "SASVIYA"
-});
+  serverType: "SASVIYA",
+  debug: true
+} as SASjsConfig);
 
 export const loadStartUp = payload => {
-  payload.service.debugLogs = sasService.debugState;
+  payload.service.debugLogs = sasService.getSasjsConfig().debug;
 
   return {
     type: "LOAD_START_UP",
@@ -34,7 +33,7 @@ const SAVE_REQUEST = payload => ({
 });
 
 export const updateDebugCheckBox = payload => {
-  sasService.debugState = payload;
+  sasService.setDebugState(payload);
 
   return {
     type: "UPDATE_DEBUG_LOGS",

@@ -156,7 +156,9 @@ const mapDispatchToProps = dispatch => ({
   updateCheckBox: val => dispatch(updateDebugCheckBox(val))
 });
 const mapStateToProps = state => {
-  return { debugLogs: state.sasData.debugLogs };
+  return {
+    debugLogs: state.sasData.debugLogs
+  };
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(Main);

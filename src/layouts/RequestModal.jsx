@@ -1,60 +1,58 @@
-import React, { useState } from "react";
-
+import React from "react";
+import * as moment from "moment";
 import { makeStyles, withStyles } from "@material-ui/styles";
 import Typography from "@material-ui/core/Typography";
 import Dialog from "@material-ui/core/Dialog";
 import DialogContent from "@material-ui/core/DialogContent";
 import DialogTitle from "@material-ui/core/DialogTitle";
 import ExpansionPanel from "@material-ui/core/ExpansionPanel";
-import ExpansionPanelDetails from "@material-ui/core/ExpansionPanelDetails";
 import ExpansionPanelSummary from "@material-ui/core/ExpansionPanelSummary";
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
 import Grid from "@material-ui/core/Grid";
 
-import Paper from '@material-ui/core/Paper';
-import Tabs from '@material-ui/core/Tabs';
-import Tab from '@material-ui/core/Tab';
+import Tabs from "@material-ui/core/Tabs";
+import Tab from "@material-ui/core/Tab";
 
 const AntTabs = withStyles({
   root: {
-    borderBottom: '1px solid #e8e8e8',
+    borderBottom: "1px solid #e8e8e8"
   },
   indicator: {
-    backgroundColor: '#1890ff',
-  },
+    backgroundColor: "#1890ff"
+  }
 })(Tabs);
 
 const AntTab = withStyles(theme => ({
   root: {
-    textTransform: 'none',
+    textTransform: "none",
     minWidth: 72,
     fontWeight: theme.typography.fontWeightRegular,
     marginRight: theme.spacing(4),
     fontFamily: [
-      '-apple-system',
-      'BlinkMacSystemFont',
+      "-apple-system",
+      "BlinkMacSystemFont",
       '"Segoe UI"',
-      'Roboto',
+      "Roboto",
       '"Helvetica Neue"',
-      'Arial',
-      'sans-serif',
+      "Arial",
+      "sans-serif",
       '"Apple Color Emoji"',
       '"Segoe UI Emoji"',
-      '"Segoe UI Symbol"',
-    ].join(','),
-    '&:hover': {
-      color: '#40a9ff',
-      opacity: 1,
+      '"Segoe UI Symbol"'
+    ].join(","),
+    "&:hover": {
+      color: "#40a9ff",
+      opacity: 1
     },
-    '&$selected': {
-      color: '#1890ff',
-      fontWeight: theme.typography.fontWeightMedium,
+    "&$selected": {
+      color: "#1890ff",
+      fontWeight: theme.typography.fontWeightMedium
     },
-    '&:focus': {
-      color: '#40a9ff',
-    },
+    "&:focus": {
+      color: "#40a9ff"
+    }
   },
-  selected: {},
+  selected: {}
 }))(props => <Tab disableRipple {...props} />);
 
 const useStyles = makeStyles(theme => ({
@@ -88,12 +86,12 @@ const useStyles = makeStyles(theme => ({
     color: "#3f51b5"
   },
   expansionDescription: {
-    backgroundColor: '#fbfbfb',
-    border: '1px solid #e2e2e2',
-    borderRadius: '3px',
+    backgroundColor: "#fbfbfb",
+    border: "1px solid #e2e2e2",
+    borderRadius: "3px",
     minHeight: "50px",
     padding: "10px",
-    boxSizing: 'border-box',
+    boxSizing: "border-box",
     whiteSpace: "pre-wrap",
     fontFamily: "Monaco, Courier, monospace",
     position: "relative",
@@ -106,7 +104,7 @@ const useStyles = makeStyles(theme => ({
     }
   },
   programlogWrapper: {
-    padding: '20px'
+    padding: "20px"
   }
 }));
 
@@ -137,7 +135,7 @@ const RequestModal = props => {
       >
         <DialogTitle id="alert-dialog-slide-title">
           <Typography variant="h3">Request History</Typography>
-          {`App Location: ${sasjsConfig.programRoot}`}
+          {`App Location: ${sasjsConfig.appLoc}`}
         </DialogTitle>
         <DialogContent>
           <div className={classes.root}>
@@ -155,10 +153,7 @@ const RequestModal = props => {
                   <Grid container spacing={3}>
                     <Grid item sm={6} xs={12}>
                       <Typography variant="h5" className={classes.heading}>
-                        {programLog.serviceLink.replace(
-                          sasjsConfig.programRoot,
-                          ""
-                        )}
+                        {programLog.serviceLink.replace(sasjsConfig.appLoc, "")}
                       </Typography>
                     </Grid>
                     <Grid item sm={6} xs={12}>
@@ -166,13 +161,13 @@ const RequestModal = props => {
                         variant="h5"
                         className={classes.secondaryHeading}
                       >
-                        {programLog.timestamp.format
-                          ? programLog.timestamp.format(
-                            "dddd, MMMM Do YYYY, h:mm:ss a"
-                          )
+                        {moment(programLog.timestamp).format
+                          ? moment(programLog.timestamp).format(
+                              "dddd, MMMM Do YYYY, h:mm:ss a"
+                            )
                           : programLog.timestamp}
-                        {programLog.timestamp.format
-                          ? ` (${programLog.timestamp.fromNow()})`
+                        {moment(programLog.timestamp).format
+                          ? ` (${moment(programLog.timestamp).fromNow()})`
                           : ""}
                       </Typography>
                     </Grid>
@@ -190,7 +185,7 @@ const RequestModal = props => {
                   <AntTab label="SAS Generated Code" />
                 </AntTabs>
 
-                {currentTab === 0 ?
+                {currentTab === 0 ? (
                   <div className={classes.programlogWrapper}>
                     <Typography
                       variant="h5"
@@ -199,11 +194,11 @@ const RequestModal = props => {
                       {programLog.logLink}
                     </Typography>
                   </div>
-                  :
-                  ''
-                }
+                ) : (
+                  ""
+                )}
 
-                {currentTab === 1 ?
+                {currentTab === 1 ? (
                   <div className={classes.programlogWrapper}>
                     <Typography
                       variant="h5"
@@ -212,11 +207,11 @@ const RequestModal = props => {
                       {programLog.sourceCode}
                     </Typography>
                   </div>
-                  :
-                  ''
-                }
+                ) : (
+                  ""
+                )}
 
-                {currentTab === 2 ?
+                {currentTab === 2 ? (
                   <div className={classes.programlogWrapper}>
                     <Typography
                       variant="h5"
@@ -225,9 +220,9 @@ const RequestModal = props => {
                       {programLog.generatedCode}
                     </Typography>
                   </div>
-                  :
-                  ''
-                }
+                ) : (
+                  ""
+                )}
               </ExpansionPanel>
             ))}
           </div>
