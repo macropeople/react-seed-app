@@ -1,13 +1,13 @@
 import SASjs from "sasjs";
 import { push } from "connected-react-router";
-import cachedData from '../../cached_data';
-import { createdStore } from './../store';
+import cachedData from "../../cached_data";
+import { createdStore } from "./../store";
 const sasService = new SASjs({
-  baseURL: "",
+  serverUrl: "",
   port: null,
   pathSAS9: "/SASStoredProcess/do",
   pathSASViya: "/SASJobExecution",
-  programRoot: "/Public/m2",
+  appLoc: "/Public/m2",
   serverType: "SASVIYA"
 });
 
@@ -17,8 +17,8 @@ export const loadStartUp = payload => {
   return {
     type: "LOAD_START_UP",
     payload: payload
-  }
-}
+  };
+};
 
 export const LOGOUT = () => ({
   type: "LOGOUT"
@@ -41,8 +41,6 @@ export const updateDebugCheckBox = payload => {
     payload: payload
   };
 };
-
-
 
 export function execStartUp() {
   return (dispatch, state) => {
@@ -95,10 +93,12 @@ export function execSASRequest(programName, data) {
         console.log(res);
 
         if (res.login === false) {
-          createdStore.dispatch(SAVE_REQUEST({
-            programName: programName,
-            data: data
-          }));
+          createdStore.dispatch(
+            SAVE_REQUEST({
+              programName: programName,
+              data: data
+            })
+          );
           createdStore.dispatch(SESSION_EXPIRED());
         }
 
