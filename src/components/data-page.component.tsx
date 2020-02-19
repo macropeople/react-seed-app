@@ -13,7 +13,7 @@ import TableRow from "@material-ui/core/TableRow";
 import Paper from "@material-ui/core/Paper";
 import { connect } from "react-redux";
 
-import { execSASRequest, execStartUp } from "../redux/actions/sasActions";
+import { execSASRequest } from "../redux/actions/sasActions";
 
 function usePrevious(value) {
   const ref = useRef();
@@ -54,6 +54,7 @@ const DataPageComponent = props => {
         }
       });
     }
+    // eslint-disable-next-line
   }, []);
 
   useEffect(() => {
