@@ -13,7 +13,7 @@ import TableRow from "@material-ui/core/TableRow";
 import Paper from "@material-ui/core/Paper";
 import { connect } from "react-redux";
 
-import { execSASRequest } from "../redux/actions/sasActions";
+import { execSASRequest, execStartUp } from "../redux/actions/sasActions";
 
 function usePrevious(value) {
   const ref = useRef();
@@ -36,30 +36,25 @@ const DataPageComponent = props => {
   });
 
   useEffect(() => {
-    let areas = null;
     if (props.startupData.areas) {
-      areas = props.startupData.areas;
+      setAreas(props.startupData.areas);
+      setSelectedArea(props.startupData.areas[0]["AREA"]);
     } else {
-      let res;
-      const makeRequest = async () => {
-        await execSASRequest("/common/appInit", null).then(r => (res = r));
-      };
-      makeRequest();
-      let jsonResponse;
-
-      try {
-        jsonResponse = JSON.parse(res);
-        areas = jsonResponse.data.areas;
-      } catch (e) {
-        console.log("Error parsing json: ", e);
-      }
+      let jsonResponse, fetchedAreas;
+      execSASRequest("/common/appInit", null).then((res: string) => {
+        try {
+          jsonResponse = JSON.parse(res);
+          fetchedAreas = jsonResponse.data.areas;
+        } catch (e) {
+          console.log("Error parsing json: ", e);
+        }
+        if (fetchedAreas) {
+          setAreas(fetchedAreas);
+          setSelectedArea(fetchedAreas[0]["AREA"]);
+        }
+      });
     }
-
-    if (areas) {
-      setAreas(areas);
-      setSelectedArea(areas[0]["AREA"]);
-    }
-  }, [props.startupData.areas]);
+  }, []);
 
   useEffect(() => {
     if (
@@ -71,6 +66,10 @@ const DataPageComponent = props => {
       executeRequest(currentRequest);
     }
   }, [props.isLoggedIn, prevLoggedIn, currentRequest]);
+
+  useEffect(() => {
+    executeRequest();
+  }, []);
 
   const areaOnChange = event => {
     console.log(event.target.value);
@@ -90,7 +89,7 @@ const DataPageComponent = props => {
     }
   };
 
-  const executeRequest = (request: any) => {
+  const executeRequest = (request?: any) => {
     if (request) {
       setIsLoading(true);
       execSASRequest(request.url, request.data).then((res: any) => {
@@ -111,9 +110,9 @@ const DataPageComponent = props => {
   return (
     <div className="home-page">
       <div className="demo-table">
-        {areas.length < 1 ? <CircularProgress /> : ""}
+        {areas && areas.length < 1 ? <CircularProgress /> : ""}
 
-        {areas.length > 0 ? (
+        {areas && areas.length > 0 ? (
           <div>
             <Select
               labelId="demo-simple-select-label"

@@ -84,14 +84,14 @@ export function execStartUp() {
   };
 }
 
-export function execSASRequest(programName, data) {
+export function execSASRequest(programName, data): Promise<any> {
   return new Promise((resolve, reject) => {
     sasService
       .request(programName, data)
       .then((res: any) => {
         console.log(res);
 
-        if (res.login === false) {
+        if (res.login! === false) {
           createdStore.dispatch(
             SAVE_REQUEST({
               programName: programName,

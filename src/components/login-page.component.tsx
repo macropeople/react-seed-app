@@ -57,7 +57,6 @@ class LoginPageComponent extends React.Component<any, MyState> {
       password: "",
       loading: false
     };
-    props.logOut();
   }
   signIn = () => {
     const self = this;
