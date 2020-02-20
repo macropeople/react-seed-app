@@ -16,16 +16,17 @@ export function requireAuthentication(Component) {
 
     checkAuth(isAuthenticated) {
       if (isAuthenticated === false) {
-        this.props.history.push("login");
+        // this.props.history.push("home");
       }
     }
 
     render() {
       return (
         <div>
-          {this.props.isAuthenticated === true ? (
+          <Component {...this.props} />
+          {/* {this.props.isAuthenticated === true ? (
             <Component {...this.props} />
-          ) : null}
+          ) : null} */}
         </div>
       );
     }
