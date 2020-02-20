@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useContext } from "react";
 import PropTypes from "prop-types";
 
 import { makeStyles } from "@material-ui/styles";
@@ -22,6 +22,8 @@ import {
 import RequestModal from "./RequestModal";
 import Username from "./UserName";
 import { connect } from "react-redux";
+import { SASContext } from "../context/sasContext";
+import LoginPageComponent from "../components/login-page.component";
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -42,6 +44,7 @@ const useStyles = makeStyles(theme => ({
 }));
 
 const Main = props => {
+  const sasContext = useContext(SASContext);
   const [isModalOpen, setIsModalOpen] = React.useState(false);
   const { children } = props;
 
@@ -57,7 +60,9 @@ const Main = props => {
     setAnchorEl(null);
     setIsModalOpen(false);
   };
-  return (
+  return !sasContext.isUserAuthenticated ? (
+    <LoginPageComponent />
+  ) : (
     <div className={classes.root}>
       <AppBar position="static">
         <Toolbar variant="dense">

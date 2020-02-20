@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useContext } from "react";
 import Button from "@material-ui/core/Button";
 import CssBaseline from "@material-ui/core/CssBaseline";
 import TextField from "@material-ui/core/TextField";
@@ -9,8 +9,7 @@ import Typography from "@material-ui/core/Typography";
 import { withStyles } from "@material-ui/core/styles";
 import Container from "@material-ui/core/Container";
 import CircularProgress from "@material-ui/core/CircularProgress";
-import { connect } from "react-redux";
-import { loadStartUp, LOGOUT } from "../redux/actions/sasActions";
+import { SASContext } from "../context/sasContext";
 
 const styles = theme => ({
   "@global": {
@@ -43,149 +42,118 @@ const styles = theme => ({
   }
 });
 
-interface MyState {
-  username: any;
-  password: any;
-  loading: boolean;
-}
+const LoginPageComponent = props => {
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
+  const classes = props.classes;
+  const context = useContext(SASContext);
 
-class LoginPageComponent extends React.Component<any, MyState> {
-  constructor(props) {
-    super(props);
-    this.state = {
-      username: "",
-      password: "",
-      loading: false
-    };
-  }
-  signIn = () => {
-    const self = this;
-    self.setState({ loading: true });
-    let jqXhr = this.props.sasService.SASlogin(
-      this.state.username,
-      this.state.password
-    );
-    jqXhr
-      .then(
-        function(res) {
-          console.log(res);
-
-          if (res.search(/success/gim)) {
-            let payload = { service: self.props.sasService, data: res };
-            self.props.loadStartUp(payload);
-            self.props.history.push("/");
-          } else {
-            if (res.search(/error/gim)) {
-              self.setState({ loading: false });
+  const signIn = () => {
+    setLoading(true);
+    if (context.sasService) {
+      context.sasService
+        .SASlogin(username, password)
+        .then(
+          (res: any) => {
+            console.log(res);
+            if (res.search(/success/gim)) {
+              if (context.setIsUserAuthenticated) {
+                context.setIsUserAuthenticated(true);
+              }
+            } else {
+              if (res.search(/error/gim)) {
+                setLoading(false);
+              }
             }
+          },
+          err => {
+            console.log(err);
+            setLoading(false);
           }
-        },
-        function(err) {
-          console.log(err);
-          self.setState({ loading: false });
-        }
-      )
-      .catch(e => {
-        if (e === 403) {
-          console.log("Invalid HOST");
-        }
-        self.setState({ loading: false });
-      });
+        )
+        .catch(e => {
+          if (e === 403) {
+            console.log("Invalid HOST");
+          }
+          setLoading(false);
+        });
+    }
   };
 
-  handleChange = e => {
+  const handleChange = e => {
     let target = e.target.name;
-    let stateObj = {};
-    stateObj[target] = e.target.value;
-    this.setState(stateObj);
+    if (target === "username") {
+      setUsername(e.target.value);
+    } else {
+      setPassword(e.target.value);
+    }
   };
 
-  render() {
-    const classes = (this.props as any).classes;
-    return (
-      <Container component="main" maxWidth="xs" className="login-page">
-        <CssBaseline />
-        <div className={`${classes.paper} col-flex LoginPageComponent`}>
-          <div>
-            <img
-              className="base-logo"
-              alt="company logo"
-              width="60px"
-              src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9Ii0xMS41IC0xMC4yMzE3NCAyMyAyMC40NjM0OCI+CiAgPHRpdGxlPlJlYWN0IExvZ288L3RpdGxlPgogIDxjaXJjbGUgY3g9IjAiIGN5PSIwIiByPSIyLjA1IiBmaWxsPSIjNjFkYWZiIi8+CiAgPGcgc3Ryb2tlPSIjNjFkYWZiIiBzdHJva2Utd2lkdGg9IjEiIGZpbGw9Im5vbmUiPgogICAgPGVsbGlwc2Ugcng9IjExIiByeT0iNC4yIi8+CiAgICA8ZWxsaXBzZSByeD0iMTEiIHJ5PSI0LjIiIHRyYW5zZm9ybT0icm90YXRlKDYwKSIvPgogICAgPGVsbGlwc2Ugcng9IjExIiByeT0iNC4yIiB0cmFuc2Zvcm09InJvdGF0ZSgxMjApIi8+CiAgPC9nPgo8L3N2Zz4K"
-            />
-          </div>
-          <Typography
-            component="h1"
-            variant="h5"
-            style={{ textAlign: "center" }}
-          >
-            Sign in
-          </Typography>
-          <form className={classes.form} noValidate>
-            <TextField
-              variant="outlined"
-              margin="normal"
-              required
-              fullWidth
-              value={this.state.username}
-              onChange={this.handleChange}
-              label="Username"
-              name="username"
-              autoComplete="username"
-              autoFocus
-            />
-            <TextField
-              variant="outlined"
-              margin="normal"
-              required
-              fullWidth
-              value={this.state.password}
-              onChange={this.handleChange}
-              name="password"
-              label="Password"
-              type="password"
-              autoComplete="current-password"
-            />
-            <FormControlLabel
-              control={<Checkbox value="remember" color="primary" />}
-              label="Remember me"
-            />
-            <Button
-              type="button"
-              fullWidth
-              variant="contained"
-              color="primary"
-              disabled={this.state.loading}
-              onClick={this.signIn}
-              className={classes.submit}
-            >
-              {this.state.loading ? (
-                <CircularProgress
-                  size={24}
-                  className={classes.buttonProgress}
-                />
-              ) : (
-                "Sign In"
-              )}
-            </Button>
-          </form>
+  return (
+    <Container component="main" maxWidth="xs" className="login-page">
+      <CssBaseline />
+      <div className={`${classes.paper} col-flex LoginPageComponent`}>
+        <div>
+          <img
+            className="base-logo"
+            alt="company logo"
+            width="60px"
+            src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9Ii0xMS41IC0xMC4yMzE3NCAyMyAyMC40NjM0OCI+CiAgPHRpdGxlPlJlYWN0IExvZ288L3RpdGxlPgogIDxjaXJjbGUgY3g9IjAiIGN5PSIwIiByPSIyLjA1IiBmaWxsPSIjNjFkYWZiIi8+CiAgPGcgc3Ryb2tlPSIjNjFkYWZiIiBzdHJva2Utd2lkdGg9IjEiIGZpbGw9Im5vbmUiPgogICAgPGVsbGlwc2Ugcng9IjExIiByeT0iNC4yIi8+CiAgICA8ZWxsaXBzZSByeD0iMTEiIHJ5PSI0LjIiIHRyYW5zZm9ybT0icm90YXRlKDYwKSIvPgogICAgPGVsbGlwc2Ugcng9IjExIiByeT0iNC4yIiB0cmFuc2Zvcm09InJvdGF0ZSgxMjApIi8+CiAgPC9nPgo8L3N2Zz4K"
+          />
         </div>
-        <Box mt={8}></Box>
-      </Container>
-    );
-  }
-}
-
-const mapStateToProps = (state: any) => {
-  return { sasService: state.sasData.service };
+        <Typography component="h1" variant="h5" style={{ textAlign: "center" }}>
+          Sign in
+        </Typography>
+        <form className={classes.form} noValidate>
+          <TextField
+            variant="outlined"
+            margin="normal"
+            required
+            fullWidth
+            value={username}
+            onChange={handleChange}
+            label="Username"
+            name="username"
+            autoComplete="username"
+            autoFocus
+          />
+          <TextField
+            variant="outlined"
+            margin="normal"
+            required
+            fullWidth
+            value={password}
+            onChange={handleChange}
+            name="password"
+            label="Password"
+            type="password"
+            autoComplete="current-password"
+          />
+          <FormControlLabel
+            control={<Checkbox value="remember" color="primary" />}
+            label="Remember me"
+          />
+          <Button
+            type="button"
+            fullWidth
+            variant="contained"
+            color="primary"
+            disabled={loading}
+            onClick={signIn}
+            className={classes.submit}
+          >
+            {loading ? (
+              <CircularProgress size={24} className={classes.buttonProgress} />
+            ) : (
+              "Sign In"
+            )}
+          </Button>
+        </form>
+      </div>
+      <Box mt={8}></Box>
+    </Container>
+  );
 };
 
-const mapDispatchToProps = dispatch => ({
-  logOut: () => dispatch(LOGOUT()),
-  loadStartUp: payload => dispatch(loadStartUp(payload))
-});
-
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(withStyles(styles)(LoginPageComponent));
+export default withStyles(styles)(LoginPageComponent);

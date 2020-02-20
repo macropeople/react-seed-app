@@ -1,5 +1,5 @@
 import React from "react";
-import { Route, HashRouter, Redirect } from "react-router-dom";
+import { Route, BrowserRouter, Redirect } from "react-router-dom";
 import HomePageComponent from "../components/home-page.component";
 import AboutPageComponent from "../components/about-page.component";
 import DebugLogsComponent from "../components/sasComponents/debug-logs.component";
@@ -7,37 +7,36 @@ import DataPageComponent from "../components/data-page.component";
 import RouteWithLayout from "./routeHOC/RouteWithLayout";
 import MainLayout from "../layouts/Main";
 import ThemeProvider from "@material-ui/styles/ThemeProvider";
-import { requireAuthentication } from "../components/guards/authGuard";
 import theme from "../theme";
 
 export default (
   <ThemeProvider theme={theme}>
-    <HashRouter>
+    <BrowserRouter>
       <Route exact path="/" component={() => <Redirect to="/home" />} />
       <RouteWithLayout
         exact
         path="/home"
-        layout={requireAuthentication(MainLayout)}
+        layout={MainLayout}
         component={HomePageComponent}
       />
       <RouteWithLayout
         exact
         path="/demo"
-        layout={requireAuthentication(MainLayout)}
+        layout={MainLayout}
         component={DataPageComponent}
       />
       <RouteWithLayout
         exact
         path="/about"
-        layout={requireAuthentication(MainLayout)}
+        layout={MainLayout}
         component={AboutPageComponent}
       />
       <RouteWithLayout
         exact
         path="/debug-logs"
-        layout={requireAuthentication(MainLayout)}
+        layout={MainLayout}
         component={DebugLogsComponent}
       />
-    </HashRouter>
+    </BrowserRouter>
   </ThemeProvider>
 );

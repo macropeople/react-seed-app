@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useContext } from "react";
 import CircularProgress from "@material-ui/core/CircularProgress";
 
 import MenuItem from "@material-ui/core/MenuItem";
@@ -14,6 +14,7 @@ import Paper from "@material-ui/core/Paper";
 import { connect } from "react-redux";
 
 import { execSASRequest } from "../redux/actions/sasActions";
+import { SASContext } from "../context/sasContext";
 
 function usePrevious(value) {
   const ref = useRef();
@@ -34,6 +35,9 @@ const DataPageComponent = props => {
     url: "/common/appInit",
     data: null as any
   });
+
+  const context = useContext(SASContext);
+  debugger;
 
   useEffect(() => {
     if (props.startupData.areas) {
