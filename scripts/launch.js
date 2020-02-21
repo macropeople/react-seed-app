@@ -3,8 +3,8 @@
 const Deployer = require('ssh-deploy-release');
 
 // Do this as the first thing so that any code reading it knows the right env.
-process.env.BABEL_ENV = 'development';
-process.env.NODE_ENV = 'development';
+process.env.BABEL_ENV = 'production';
+process.env.NODE_ENV = 'production';
 
 // Makes the script crash on unhandled rejections instead of silently
 // ignoring them. In the future, promise rejections that are not handled will
@@ -17,24 +17,28 @@ process.on('unhandledRejection', err => {
 require('../config/env');
 
 
-const fs = require('fs');
+const path = require('path');
 const chalk = require('react-dev-utils/chalk');
+const fs = require('fs-extra');
 const webpack = require('webpack');
-const WebpackDevServer = require('webpack-dev-server');
-const clearConsole = require('react-dev-utils/clearConsole');
-const checkRequiredFiles = require('react-dev-utils/checkRequiredFiles');
-const {
-  choosePort,
-  createCompiler,
-  prepareProxy,
-  prepareUrls,
-} = require('react-dev-utils/WebpackDevServerUtils');
+const configFactory = require('../config/webpack.config');
 const openBrowser = require('react-dev-utils/openBrowser');
 const paths = require('../config/paths');
-const configFactory = require('../config/webpack.config');
-const createDevServerConfig = require('../config/webpackDevServer.config');
+const checkRequiredFiles = require('react-dev-utils/checkRequiredFiles');
+const formatWebpackMessages = require('react-dev-utils/formatWebpackMessages');
+const printHostingInstructions = require('react-dev-utils/printHostingInstructions');
+const FileSizeReporter = require('react-dev-utils/FileSizeReporter');
+const printBuildError = require('react-dev-utils/printBuildError');
 
+const measureFileSizesBeforeBuild =
+  FileSizeReporter.measureFileSizesBeforeBuild;
+const printFileSizesAfterBuild = FileSizeReporter.printFileSizesAfterBuild;
 const useYarn = fs.existsSync(paths.yarnLockFile);
+
+// These sizes are pretty large. We'll warn for bundles exceeding them.
+const WARN_AFTER_BUNDLE_GZIP_SIZE = 512 * 1024;
+const WARN_AFTER_CHUNK_GZIP_SIZE = 1024 * 1024;
+
 const isInteractive = process.stdout.isTTY;
 
 // Warn and crash if required files are missing
@@ -42,97 +46,174 @@ if (!checkRequiredFiles([paths.appHtml, paths.appIndexJs])) {
   process.exit(1);
 }
 
-// Tools like Cloud9 rely on this.
-const DEFAULT_PORT = parseInt(process.env.PORT, 10) || 3000;
-const HOST = process.env.HOST || '0.0.0.0';
-
-if (process.env.HOST) {
-  console.log(
-    chalk.cyan(
-      `Attempting to bind to HOST environment variable: ${chalk.yellow(
-        chalk.bold(process.env.HOST)
-      )}`
-    )
-  );
-  console.log(
-    `If this was unintentional, check that you haven't mistakenly set it in your shell.`
-  );
-  console.log(
-    `Learn more here: ${chalk.yellow('https://bit.ly/CRA-advanced-config')}`
-  );
-  console.log();
-}
+// Generate configuration
+const config = configFactory('production');
 
 // We require that you explicitly set browsers and do not fall back to
 // browserslist defaults.
 const { checkBrowsers } = require('react-dev-utils/browsersHelper');
 checkBrowsers(paths.appPath, isInteractive)
   .then(() => {
-    // We attempt to use the default port but if it is busy, we offer the user to
-    // run on a different port. `choosePort()` Promise resolves to the next free port.
-    return choosePort(HOST, DEFAULT_PORT);
+    // First, read the current file sizes in build directory.
+    // This lets us display how much they changed later.
+    return measureFileSizesBeforeBuild(paths.appBuild);
   })
-  .then(port => {
-    if (port == null) {
-      // We have not found a port.
-      return;
+  .then(previousFileSizes => {
+    // Remove all content but keep the directory so that
+    // if you're in it, you don't end up in Trash
+    fs.emptyDirSync(paths.appBuild);
+    // Merge with the public folder
+    copyPublicFolder();
+    // Start the webpack build
+    return build(previousFileSizes);
+  })
+  .then(
+    ({ stats, previousFileSizes, warnings }) => {
+      if (warnings.length) {
+        console.log(chalk.yellow('Compiled with warnings.\n'));
+        console.log(warnings.join('\n\n'));
+        console.log(
+          '\nSearch for the ' +
+            chalk.underline(chalk.yellow('keywords')) +
+            ' to learn more about each warning.'
+        );
+        console.log(
+          'To ignore, add ' +
+            chalk.cyan('// eslint-disable-next-line') +
+            ' to the line before.\n'
+        );
+      } else {
+        console.log(chalk.green('Compiled successfully.\n'));
+      }
+
+      console.log('File sizes after gzip:\n');
+      printFileSizesAfterBuild(
+        stats,
+        previousFileSizes,
+        paths.appBuild,
+        WARN_AFTER_BUNDLE_GZIP_SIZE,
+        WARN_AFTER_CHUNK_GZIP_SIZE
+      );
+      console.log();
+
+      const appPackage = require(paths.appPackageJson);
+      const publicUrl = paths.publicUrl;
+      const publicPath = config.output.publicPath;
+      const buildFolder = path.relative(process.cwd(), paths.appBuild);
+      printHostingInstructions(
+        appPackage,
+        publicUrl,
+        publicPath,
+        buildFolder,
+        useYarn
+      );
+
+      console.log(chalk.cyan('Sending files to server...\n'));
+
+      // needs to define server host, your username and your privatekey path
+      const host = '167.172.41.194';
+      const username = 'saad';
+      const privateKey = '/home/saad/.ssh/id_rsa';
+      const pathToProject = '/demo/';
+      const pathDeployed = '/var/www/html'+pathToProject;
+      const options = {
+        localPath: paths.appBuild,
+        host: host,
+        port: 22,
+        mode: 'synchronize',
+        username: username,
+        privateKey: require('fs').readFileSync(privateKey),
+        deployPath: pathDeployed
+      };
+      const deployer = new Deployer(options);
+      deployer.deployRelease((res) => {
+        console.log('Ok !')
+        console.log('App is hosted at: ' + host + pathToProject + 'synchronized/')
+      });
+      openBrowser(host + pathToProject + 'synchronized/');
+
+    },
+    err => {
+      console.log(chalk.red('Failed to compile.\n'));
+      printBuildError(err);
+      process.exit(1);
     }
-    const config = configFactory('development');
-    const protocol = process.env.HTTPS === 'true' ? 'https' : 'http';
-    const appName = require(paths.appPackageJson).name;
-    const useTypeScript = fs.existsSync(paths.appTsConfig);
-    const urls = prepareUrls(protocol, HOST, port);
-    const devSocket = {
-      warnings: warnings =>
-        devServer.sockWrite(devServer.sockets, 'warnings', warnings),
-      errors: errors =>
-        devServer.sockWrite(devServer.sockets, 'errors', errors),
-    };
-    // Create a webpack compiler that is configured with custom messages.
-    const compiler = createCompiler({
-      appName,
-      config,
-      devSocket,
-      urls,
-      useYarn,
-      useTypeScript,
-      webpack,
-    });
-    // Load proxy config
-    const proxySetting = require(paths.appPackageJson).proxy;
-    const proxyConfig = prepareProxy(proxySetting, paths.appPublic);
-    // Serve webpack assets generated by the compiler over a web server.
-    const serverConfig = createDevServerConfig(
-      proxyConfig,
-      urls.lanUrlForConfig
-    );
-
-
-
-    console.log(chalk.cyan('Sending files to server...\n'));
-
-    const host = '167.172.41.194';
-    const path = '/var/www/html/demo/synchronized';
-    const options = {
-      localPath: paths.appPublic,
-      host: host,
-      port: 22,
-      mode: 'synchronize',
-      username: 'allan',
-      privateKey: require('fs').readFileSync('/Users/allan/.ssh/id_rsa'),
-      deployPath: path
-    };
-    const deployer = new Deployer(options);
-    deployer.deployRelease(() => {
-      console.log('Ok !')
-    });
-    openBrowser(host + path);
-
-
-  })
+  )
   .catch(err => {
     if (err && err.message) {
       console.log(err.message);
     }
     process.exit(1);
   });
+
+// Create the production build and print the deployment instructions.
+function build(previousFileSizes) {
+  // We used to support resolving modules according to `NODE_PATH`.
+  // This now has been deprecated in favor of jsconfig/tsconfig.json
+  // This lets you use absolute paths in imports inside large monorepos:
+  if (process.env.NODE_PATH) {
+    console.log(
+      chalk.yellow(
+        'Setting NODE_PATH to resolve modules absolutely has been deprecated in favor of setting baseUrl in jsconfig.json (or tsconfig.json if you are using TypeScript) and will be removed in a future major release of create-react-app.'
+      )
+    );
+    console.log();
+  }
+
+  console.log('Creating an optimized production build...');
+
+  const compiler = webpack(config);
+  return new Promise((resolve, reject) => {
+    compiler.run((err, stats) => {
+      let messages;
+      if (err) {
+        if (!err.message) {
+          return reject(err);
+        }
+        messages = formatWebpackMessages({
+          errors: [err.message],
+          warnings: [],
+        });
+      } else {
+        messages = formatWebpackMessages(
+          stats.toJson({ all: false, warnings: true, errors: true })
+        );
+      }
+      if (messages.errors.length) {
+        // Only keep the first error. Others are often indicative
+        // of the same problem, but confuse the reader with noise.
+        if (messages.errors.length > 1) {
+          messages.errors.length = 1;
+        }
+        return reject(new Error(messages.errors.join('\n\n')));
+      }
+      if (
+        process.env.CI &&
+        (typeof process.env.CI !== 'string' ||
+          process.env.CI.toLowerCase() !== 'false') &&
+        messages.warnings.length
+      ) {
+        console.log(
+          chalk.yellow(
+            '\nTreating warnings as errors because process.env.CI = true.\n' +
+              'Most CI servers set it automatically.\n'
+          )
+        );
+        return reject(new Error(messages.warnings.join('\n\n')));
+      }
+
+      return resolve({
+        stats,
+        previousFileSizes,
+        warnings: messages.warnings,
+      });
+    });
+  });
+}
+
+function copyPublicFolder() {
+  fs.copySync(paths.appPublic, paths.appBuild, {
+    dereference: true,
+    filter: file => file !== paths.appHtml,
+  });
+}
