@@ -1,20 +1,14 @@
 import { AppContainer } from "react-hot-loader";
-import { Provider } from "react-redux";
 import React from "react";
 import ReactDOM from "react-dom";
-import App from "./App";
 import "./index.scss";
+import "./App.scss";
 import * as serviceWorker from "./serviceWorker";
-import configureStore, { history } from "./redux/store";
+import routes from "./routes";
 
-const store = configureStore();
 const render = () => {
   ReactDOM.render(
-    <AppContainer>
-      <Provider store={store}>
-        <App history={history} />
-      </Provider>
-    </AppContainer>,
+    <AppContainer>{routes}</AppContainer>,
     document.getElementById("root")
   );
 };

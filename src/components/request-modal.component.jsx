@@ -134,7 +134,9 @@ const RequestModal = props => {
         aria-describedby="alert-dialog-slide-description"
       >
         <DialogTitle id="alert-dialog-slide-title">
-          <Typography variant="h3">Request History</Typography>
+          <Typography style={{ fontSize: "1.5rem" }}>
+            Request History
+          </Typography>
           {`App Location: ${sasjsConfig.appLoc}`}
         </DialogTitle>
         <DialogContent>

@@ -3,7 +3,7 @@ import IconButton from "@material-ui/core/IconButton";
 import AccountCircle from "@material-ui/icons/AccountCircle";
 import Typography from "@material-ui/core/Typography";
 
-const Username = props => {
+const UserName = props => {
   return (
     <IconButton
       aria-label="account of current user"
@@ -20,4 +20,4 @@ const Username = props => {
   );
 };
 
-export default Username;
+export default UserName;

@@ -1,4 +1,10 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, {
+  useState,
+  useEffect,
+  useRef,
+  useContext,
+  useCallback
+} from "react";
 import CircularProgress from "@material-ui/core/CircularProgress";
 
 import MenuItem from "@material-ui/core/MenuItem";
@@ -11,9 +17,7 @@ import TableContainer from "@material-ui/core/TableContainer";
 import TableHead from "@material-ui/core/TableHead";
 import TableRow from "@material-ui/core/TableRow";
 import Paper from "@material-ui/core/Paper";
-import { connect } from "react-redux";
-
-import { execSASRequest } from "../redux/actions/sasActions";
+import { SASContext } from "../context/sasContext";
 
 function usePrevious(value) {
   const ref = useRef();
@@ -23,62 +27,56 @@ function usePrevious(value) {
   return ref.current;
 }
 
-const DataPageComponent = props => {
-  const { isLoggedIn } = props;
-  const prevLoggedIn = usePrevious(isLoggedIn);
+const DataPageComponent = () => {
+  const sasContext = useContext(SASContext);
+  const prevLoggedIn = usePrevious(sasContext.isUserLoggedIn);
   const [areas, setAreas] = useState([]);
   const [selectedArea, setSelectedArea] = useState("");
   const [springs, setSprings] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
-  const [currentRequest, setCurrentRequest] = useState({
-    url: "/common/appInit",
-    data: null as any
-  });
+  const [currentRequest, setCurrentRequest] = useState(null as any);
+
+  const executeRequest = useCallback(
+    request => {
+      if (request) {
+        setIsLoading(true);
+        if (sasContext.request) {
+          sasContext.request(request).then(res => {
+            if (res && res.springs && res.springs.data) {
+              setSprings(res.springs.data);
+            }
+            setIsLoading(false);
+          });
+        }
+      }
+    },
+    [sasContext]
+  );
 
   useEffect(() => {
-    if (props.startupData.areas) {
-      setAreas(props.startupData.areas);
-      setSelectedArea(props.startupData.areas[0]["AREA"]);
-    } else {
-      let jsonResponse, fetchedAreas;
-      execSASRequest("/common/appInit", null).then((res: string) => {
-        try {
-          jsonResponse = JSON.parse(res);
-          fetchedAreas = jsonResponse.areas.data;
-        } catch (e) {
-          console.log("Error parsing json: ", e);
-        }
-        if (fetchedAreas) {
-          setAreas(fetchedAreas);
-          setSelectedArea(fetchedAreas[0]["AREA"]);
-        }
-      });
+    if (sasContext.startupData) {
+      setAreas(sasContext.startupData);
+      setSelectedArea(sasContext.startupData[0]["AREA"]);
     }
-    // eslint-disable-next-line
-  }, []);
+  }, [sasContext.startupData]);
 
   useEffect(() => {
     if (
       !prevLoggedIn &&
-      props.isLoggedIn &&
+      sasContext.isUserLoggedIn &&
       currentRequest &&
       currentRequest.data
     ) {
       executeRequest(currentRequest);
     }
-  }, [props.isLoggedIn, prevLoggedIn, currentRequest]);
-
-  useEffect(() => {
-    executeRequest();
-  }, []);
+  }, [sasContext.isUserLoggedIn, prevLoggedIn, currentRequest, executeRequest]);
 
   const areaOnChange = event => {
-    console.log(event.target.value);
     setSelectedArea(event.target.value);
   };
 
   const submitArea = () => {
-    if (props.isLoggedIn) {
+    if (sasContext.isUserLoggedIn) {
       const request = {
         url: "/common/getData",
         data: {
@@ -87,24 +85,6 @@ const DataPageComponent = props => {
       };
       setCurrentRequest(request);
       executeRequest(request);
-    }
-  };
-
-  const executeRequest = (request?: any) => {
-    if (request) {
-      setIsLoading(true);
-      execSASRequest(request.url, request.data).then((res: any) => {
-        let jsonResponse;
-
-        try {
-          jsonResponse = JSON.parse(res);
-          console.log(jsonResponse);
-          setSprings(jsonResponse.springs.data);
-        } catch (e) {
-          console.log("Error parsing json: ", e);
-        }
-        setIsLoading(false);
-      });
     }
   };
 
@@ -184,11 +164,4 @@ const DataPageComponent = props => {
   );
 };
 
-const mapStateToProps = (state: any) => {
-  return {
-    startupData: state.sasData.startupData,
-    isLoggedIn: state.sasData.userLogged
-  };
-};
-
-export default connect(mapStateToProps)(DataPageComponent);
+export default DataPageComponent;
