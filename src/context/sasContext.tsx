@@ -4,12 +4,13 @@ import React, {
   Dispatch,
   SetStateAction,
   useEffect,
-  useRef
+  useCallback
 } from "react";
 import SASjs, { SASjsConfig } from "sasjs";
 
 interface SASContextProps {
   isUserLoggedIn: boolean;
+  checkingSession: boolean;
   userName: string;
   sasService: SASjs;
   setIsUserLoggedIn: null | Dispatch<SetStateAction<boolean>>;
@@ -28,57 +29,57 @@ const sasService = new SASjs({
 
 export const SASContext = createContext<SASContextProps>({
   isUserLoggedIn: false,
+  checkingSession: false,
   userName: "",
   sasService,
   setIsUserLoggedIn: null,
   startupData: null
 });
 
-const sessionCheckIntervalMins = 10;
-
 const SASProvider = ({ children }) => {
   const [isUserLoggedIn, setIsUserLoggedIn] = useState(false);
+  const [checkingSession, setCheckingSession] = useState(false);
   const [userName, setUserName] = useState("");
   const [startupData, setStartupData] = useState(null);
-  const checkSessionTimer = useRef(null as any);
+
+  const fetchStartupData = useCallback(() => {
+    sasService.request("common/appInit", null, true).then((response: any) => {
+      let responseJson;
+      try {
+        responseJson = JSON.parse(response);
+      } catch (e) {
+        console.log(e);
+      }
+      if (responseJson && responseJson.areas && responseJson.areas.data) {
+        setStartupData(responseJson.areas.data);
+      } else if (responseJson && responseJson.status === 449) {
+        fetchStartupData();
+      }
+    });
+  }, []);
 
   useEffect(() => {
+    setCheckingSession(true);
     sasService.checkSession().then(response => {
+      setCheckingSession(false);
       setIsUserLoggedIn(response.isLoggedIn);
     });
-    checkSessionTimer.current = setInterval(() => {
-      sasService.checkSession().then(response => {
-        setIsUserLoggedIn(response.isLoggedIn);
-      });
-    }, sessionCheckIntervalMins * 60 * 1000);
-    return () => clearTimeout(checkSessionTimer.current);
   }, []);
 
   useEffect(() => {
     if (isUserLoggedIn) {
       setUserName(sasService.getUserName());
       if (!startupData) {
-        sasService
-          .request("common/appInit", null, true)
-          .then((response: any) => {
-            let responseJson;
-            try {
-              responseJson = JSON.parse(response);
-            } catch (e) {
-              console.log(e);
-            }
-            if (responseJson && responseJson.data) {
-              setStartupData(responseJson.data);
-            }
-          });
+        fetchStartupData();
       }
     }
-  }, [isUserLoggedIn, startupData]);
+  }, [isUserLoggedIn, startupData, fetchStartupData]);
 
   return (
     <SASContext.Provider
       value={{
         isUserLoggedIn,
+        checkingSession,
         userName,
         sasService,
         setIsUserLoggedIn,

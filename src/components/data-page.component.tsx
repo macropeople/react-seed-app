@@ -1,4 +1,10 @@
-import React, { useState, useEffect, useRef, useContext } from "react";
+import React, {
+  useState,
+  useEffect,
+  useRef,
+  useContext,
+  useCallback
+} from "react";
 import CircularProgress from "@material-ui/core/CircularProgress";
 
 import MenuItem from "@material-ui/core/MenuItem";
@@ -30,10 +36,38 @@ const DataPageComponent = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [currentRequest, setCurrentRequest] = useState(null as any);
 
+  const executeRequest = useCallback(
+    request => {
+      if (request) {
+        setIsLoading(true);
+        sasContext.sasService
+          .request(request.url, request.data)
+          .then((res: any) => {
+            let jsonResponse;
+            if (res.login === false) {
+              if (sasContext.setIsUserLoggedIn) {
+                sasContext.setIsUserLoggedIn(false);
+              }
+              return;
+            }
+
+            try {
+              jsonResponse = JSON.parse(res);
+              setSprings(jsonResponse.springs.data);
+            } catch (e) {
+              console.log("Error parsing json: ", e);
+            }
+            setIsLoading(false);
+          });
+      }
+    },
+    [sasContext]
+  );
+
   useEffect(() => {
-    if (sasContext.startupData && sasContext.startupData.areas) {
-      setAreas(sasContext.startupData.areas);
-      setSelectedArea(sasContext.startupData.areas[0]["AREA"]);
+    if (sasContext.startupData) {
+      setAreas(sasContext.startupData);
+      setSelectedArea(sasContext.startupData[0]["AREA"]);
     }
   }, [sasContext.startupData]);
 
@@ -46,7 +80,7 @@ const DataPageComponent = () => {
     ) {
       executeRequest(currentRequest);
     }
-  }, [sasContext.isUserLoggedIn, prevLoggedIn, currentRequest]);
+  }, [sasContext.isUserLoggedIn, prevLoggedIn, currentRequest, executeRequest]);
 
   const areaOnChange = event => {
     setSelectedArea(event.target.value);
@@ -62,31 +96,6 @@ const DataPageComponent = () => {
       };
       setCurrentRequest(request);
       executeRequest(request);
-    }
-  };
-
-  const executeRequest = request => {
-    if (request) {
-      setIsLoading(true);
-      sasContext.sasService
-        .request(request.url, request.data)
-        .then((res: any) => {
-          let jsonResponse;
-          if (res.login === false) {
-            if (sasContext.setIsUserLoggedIn) {
-              sasContext.setIsUserLoggedIn(false);
-            }
-            return;
-          }
-
-          try {
-            jsonResponse = JSON.parse(res);
-            setSprings(jsonResponse.springs.data);
-          } catch (e) {
-            console.log("Error parsing json: ", e);
-          }
-          setIsLoading(false);
-        });
     }
   };
 

@@ -12,10 +12,10 @@ import FormControlLabel from "@material-ui/core/FormControlLabel";
 import Button from "@material-ui/core/Button";
 import Menu from "@material-ui/core/Menu";
 import { Link } from "react-router-dom";
-import RequestModal from "./RequestModal";
-import Username from "./UserName";
+import RequestModal from "../components/request-modal.component";
+import UserName from "../components/user-name.component";
 import { SASContext } from "../context/sasContext";
-import LoginPageComponent from "../components/login-page.component";
+import LoginComponent from "../components/login.component";
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -86,7 +86,7 @@ const Main = props => {
                 justifyContent: "flex-end"
               }}
             >
-              <Username
+              <UserName
                 userName={sasContext.userName}
                 onClickHandler={handleMenu}
                 className={classes.title}
@@ -154,7 +154,9 @@ const Main = props => {
           open={open}
         />
       </div>
-      {!sasContext.isUserLoggedIn && <LoginPageComponent />}
+      {!(sasContext.isUserLoggedIn || sasContext.checkingSession) && (
+        <LoginComponent />
+      )}
     </>
   );
 };

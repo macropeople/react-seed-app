@@ -42,7 +42,7 @@ const styles = theme => ({
   }
 });
 
-const LoginPageComponent = props => {
+const LoginComponent = props => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
@@ -93,7 +93,7 @@ const LoginPageComponent = props => {
   return (
     <Container component="main" maxWidth="xs" className="login-page">
       <CssBaseline />
-      <div className={`${classes.paper} col-flex LoginPageComponent`}>
+      <div className={`${classes.paper} col-flex LoginComponent`}>
         <div>
           <img
             className="base-logo"
@@ -156,4 +156,4 @@ const LoginPageComponent = props => {
   );
 };
 
-export default withStyles(styles)(LoginPageComponent);
+export default withStyles(styles)(LoginComponent);
