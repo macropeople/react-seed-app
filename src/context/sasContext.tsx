@@ -21,7 +21,7 @@ interface SASContextProps {
 }
 
 const sasService = new SASjs({
-  serverUrl: "http://pv.analytium.co.uk",
+  serverUrl: " ",
   port: null,
   pathSAS9: "/SASStoredProcess/do",
   pathSASViya: "/SASJobExecution",
