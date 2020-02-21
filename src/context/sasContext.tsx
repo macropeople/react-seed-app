@@ -14,6 +14,7 @@ interface SASContextProps {
   userName: string;
   sasService: SASjs;
   setIsUserLoggedIn: null | Dispatch<SetStateAction<boolean>>;
+  login: ((userName: string, password: string) => Promise<boolean>) | null;
   startupData: any;
 }
 
@@ -33,6 +34,7 @@ export const SASContext = createContext<SASContextProps>({
   userName: "",
   sasService,
   setIsUserLoggedIn: null,
+  login: null,
   startupData: null
 });
 
@@ -56,6 +58,35 @@ const SASProvider = ({ children }) => {
         fetchStartupData();
       }
     });
+  }, []);
+
+  const login = useCallback((userName, password) => {
+    return sasService
+      .SASlogin(userName, password)
+      .then(
+        (res: any) => {
+          if (res.search(/success/gim)) {
+            setIsUserLoggedIn(true);
+            return true;
+          } else {
+            setIsUserLoggedIn(false);
+            return false;
+            // setLoading(false);
+          }
+        },
+        err => {
+          console.error(err);
+          return false;
+          // setLoading(false);
+        }
+      )
+      .catch(e => {
+        if (e === 403) {
+          console.error("Invalid host");
+        }
+        return false;
+        // setLoading(false);
+      });
   }, []);
 
   useEffect(() => {
@@ -83,6 +114,7 @@ const SASProvider = ({ children }) => {
         userName,
         sasService,
         setIsUserLoggedIn,
+        login,
         startupData
       }}
     >
