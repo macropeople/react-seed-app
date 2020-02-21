@@ -1,11 +1,7 @@
-import React, { useContext } from "react";
 import "./App.scss";
 import routes from "./routes";
-import SASProvider, { SASContext } from "./context/sasContext";
 
-const App = props => {
-  return <SASProvider>{routes}</SASProvider>;
-};
+const App = () => routes;
 // class App extends React.Component<any, any> {
 //   componentDidMount() {
 //     this.props.execStartUp();

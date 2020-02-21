@@ -58,8 +58,8 @@ const LoginPageComponent = props => {
           (res: any) => {
             console.log(res);
             if (res.search(/success/gim)) {
-              if (context.setIsUserAuthenticated) {
-                context.setIsUserAuthenticated(true);
+              if (context.setIsUserLoggedIn) {
+                context.setIsUserLoggedIn(true);
               }
             } else {
               if (res.search(/error/gim)) {

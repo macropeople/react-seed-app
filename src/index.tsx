@@ -5,14 +5,14 @@ import ReactDOM from "react-dom";
 import App from "./App";
 import "./index.scss";
 import * as serviceWorker from "./serviceWorker";
-import configureStore, { history } from "./redux/store";
+import configureStore from "./redux/store";
 
 const store = configureStore();
 const render = () => {
   ReactDOM.render(
     <AppContainer>
       <Provider store={store}>
-        <App history={history} />
+        <App />
       </Provider>
     </AppContainer>,
     document.getElementById("root")
