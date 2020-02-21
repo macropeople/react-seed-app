@@ -44,7 +44,7 @@ const DataPageComponent = props => {
       execSASRequest("/common/appInit", null).then((res: string) => {
         try {
           jsonResponse = JSON.parse(res);
-          fetchedAreas = jsonResponse.data.areas;
+          fetchedAreas = jsonResponse.areas.data;
         } catch (e) {
           console.log("Error parsing json: ", e);
         }
@@ -99,7 +99,7 @@ const DataPageComponent = props => {
         try {
           jsonResponse = JSON.parse(res);
           console.log(jsonResponse);
-          setSprings(jsonResponse.data.springs);
+          setSprings(jsonResponse.springs.data);
         } catch (e) {
           console.log("Error parsing json: ", e);
         }
@@ -140,8 +140,8 @@ const DataPageComponent = props => {
             </Button>
           </div>
         ) : (
-          ""
-        )}
+            ""
+          )}
 
         <hr />
 
@@ -177,8 +177,8 @@ const DataPageComponent = props => {
             </Table>
           </TableContainer>
         ) : (
-          ""
-        )}
+            ""
+          )}
       </div>
     </div>
   );
