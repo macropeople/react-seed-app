@@ -120,8 +120,8 @@ const DataPageComponent = () => {
             </Button>
           </div>
         ) : (
-          ""
-        )}
+            ""
+          )}
 
         <hr />
 
@@ -157,8 +157,8 @@ const DataPageComponent = () => {
             </Table>
           </TableContainer>
         ) : (
-          ""
-        )}
+            ""
+          )}
       </div>
     </div>
   );
