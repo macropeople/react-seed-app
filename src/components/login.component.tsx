@@ -56,7 +56,6 @@ const LoginComponent = props => {
         .SASlogin(username, password)
         .then(
           (res: any) => {
-            console.log(res);
             if (res.search(/success/gim)) {
               if (context.setIsUserLoggedIn) {
                 context.setIsUserLoggedIn(true);
@@ -68,13 +67,13 @@ const LoginComponent = props => {
             }
           },
           err => {
-            console.log(err);
+            console.error(err);
             setLoading(false);
           }
         )
         .catch(e => {
           if (e === 403) {
-            console.log("Invalid HOST");
+            console.error("Invalid host");
           }
           setLoading(false);
         });

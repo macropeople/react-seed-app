@@ -55,7 +55,7 @@ const DataPageComponent = () => {
               jsonResponse = JSON.parse(res);
               setSprings(jsonResponse.springs.data);
             } catch (e) {
-              console.log("Error parsing json: ", e);
+              console.error("Error parsing json: ", e);
             }
             setIsLoading(false);
           });

@@ -48,7 +48,7 @@ const SASProvider = ({ children }) => {
       try {
         responseJson = JSON.parse(response);
       } catch (e) {
-        console.log(e);
+        console.error(e);
       }
       if (responseJson && responseJson.areas && responseJson.areas.data) {
         setStartupData(responseJson.areas.data);
