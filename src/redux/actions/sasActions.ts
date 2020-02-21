@@ -1,7 +1,7 @@
 import SASjs, { SASjsConfig } from "sasjs";
 import { createdStore } from "./../store";
 const sasService = new SASjs({
-  serverUrl: "",
+  serverUrl: "http://pv.analytium.co.uk",
   port: null,
   pathSAS9: "/SASStoredProcess/do",
   pathSASViya: "/SASJobExecution",
