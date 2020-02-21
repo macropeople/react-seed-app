@@ -15,6 +15,8 @@ interface SASContextProps {
   sasService: SASjs;
   setIsUserLoggedIn: null | Dispatch<SetStateAction<boolean>>;
   login: ((userName: string, password: string) => Promise<boolean>) | null;
+  logout: (() => void) | null;
+  request: (({ url, data }) => Promise<any>) | null;
   startupData: any;
 }
 
@@ -35,6 +37,8 @@ export const SASContext = createContext<SASContextProps>({
   sasService,
   setIsUserLoggedIn: null,
   login: null,
+  logout: null,
+  request: null,
   startupData: null
 });
 
@@ -71,13 +75,11 @@ const SASProvider = ({ children }) => {
           } else {
             setIsUserLoggedIn(false);
             return false;
-            // setLoading(false);
           }
         },
         err => {
           console.error(err);
           return false;
-          // setLoading(false);
         }
       )
       .catch(e => {
@@ -85,8 +87,31 @@ const SASProvider = ({ children }) => {
           console.error("Invalid host");
         }
         return false;
-        // setLoading(false);
       });
+  }, []);
+
+  const logout = useCallback(() => {
+    sasService.logOut().then(() => {
+      setIsUserLoggedIn(false);
+    });
+  }, []);
+
+  const request = useCallback(({ url, data }) => {
+    return sasService.request(url, data).then((res: any) => {
+      let jsonResponse;
+      if (res.login === false) {
+        setIsUserLoggedIn(false);
+        return false;
+      }
+
+      try {
+        jsonResponse = JSON.parse(res);
+        return jsonResponse;
+      } catch (e) {
+        console.error("Error parsing json: ", e);
+        return false;
+      }
+    });
   }, []);
 
   useEffect(() => {
@@ -115,6 +140,8 @@ const SASProvider = ({ children }) => {
         sasService,
         setIsUserLoggedIn,
         login,
+        logout,
+        request,
         startupData
       }}
     >

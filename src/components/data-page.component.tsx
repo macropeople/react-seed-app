@@ -40,25 +40,14 @@ const DataPageComponent = () => {
     request => {
       if (request) {
         setIsLoading(true);
-        sasContext.sasService
-          .request(request.url, request.data)
-          .then((res: any) => {
-            let jsonResponse;
-            if (res.login === false) {
-              if (sasContext.setIsUserLoggedIn) {
-                sasContext.setIsUserLoggedIn(false);
-              }
-              return;
-            }
-
-            try {
-              jsonResponse = JSON.parse(res);
-              setSprings(jsonResponse.springs.data);
-            } catch (e) {
-              console.error("Error parsing json: ", e);
+        if (sasContext.request) {
+          sasContext.request(request).then(res => {
+            if (res && res.springs && res.springs.data) {
+              setSprings(res.springs.data);
             }
             setIsLoading(false);
           });
+        }
       }
     },
     [sasContext]

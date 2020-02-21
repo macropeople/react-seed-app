@@ -129,13 +129,7 @@ const Main = props => {
                 </MenuItem>
                 <MenuItem>Documentation</MenuItem>
                 <Divider variant="middle" />
-                <MenuItem
-                  onClick={() => {
-                    sasContext.sasService.logOut().then(() => {
-                      sasContext.setIsUserLoggedIn(false);
-                    });
-                  }}
-                >
+                <MenuItem onClick={sasContext.logout}>
                   <Button variant="contained" color="secondary">
                     Logout
                   </Button>
