@@ -84,10 +84,12 @@
   "devDependencies": {
     "prettier": "^1.19.1",
     "react-hot-loader": "^4.12.14",
+    "ssh-deploy-release": "^3.0.3",
     "standard-version": "^7.1.0"
   },
   "scripts": {
     "start": "node scripts/start.js",
+    "launch": "node scripts/launch.js",
     "build": "node scripts/build.js",
     "test": "node scripts/test.js"
   },
