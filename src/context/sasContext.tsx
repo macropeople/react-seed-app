@@ -25,7 +25,7 @@ const sasService = new SASjs({
   port: null,
   pathSAS9: "/SASStoredProcess/do",
   pathSASViya: "/SASJobExecution",
-  appLoc: "/Public/m2",
+  appLoc: "/Public/app",
   serverType: "SASVIYA",
   debug: true
 } as SASjsConfig);
@@ -56,10 +56,10 @@ const SASProvider = ({ children }) => {
       } catch (e) {
         console.error(e);
       }
-      if (responseJson && responseJson.areas && responseJson.areas.data) {
-        setStartupData(responseJson.areas.data);
-      } else if (responseJson && responseJson.status === 449) {
+      if (responseJson && responseJson.status === 449) {
         fetchStartupData();
+      } else {
+        setStartupData(responseJson);
       }
     });
   }, []);

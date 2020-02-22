@@ -55,8 +55,8 @@ const DataPageComponent = () => {
 
   useEffect(() => {
     if (sasContext.startupData) {
-      setAreas(sasContext.startupData);
-      setSelectedArea(sasContext.startupData[0]["AREA"]);
+      setAreas(sasContext.startupData.areas.data);
+      setSelectedArea(sasContext.startupData.areas.data[0]["AREA"]);
     }
   }, [sasContext.startupData]);
 
