@@ -1,5 +1,5 @@
 import React from "react";
-import { Route, BrowserRouter, Redirect } from "react-router-dom";
+import { Route, HashRouter, Redirect } from "react-router-dom";
 import HomePageComponent from "../components/home-page.component";
 import DataPageComponent from "../components/data-page.component";
 import RouteWithLayout from "./routeHOC/RouteWithLayout";
@@ -11,7 +11,7 @@ import SASProvider from "../context/sasContext";
 export default (
   <ThemeProvider theme={theme}>
     <SASProvider>
-      <BrowserRouter>
+      <HashRouter>
         <Route exact path="/" component={() => <Redirect to="/home" />} />
         <RouteWithLayout
           exact
@@ -25,7 +25,7 @@ export default (
           layout={MainLayout}
           component={DataPageComponent}
         />
-      </BrowserRouter>
+      </HashRouter>
     </SASProvider>
   </ThemeProvider>
 );
