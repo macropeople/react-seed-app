@@ -132,7 +132,7 @@ const DataPageComponent = () => {
             <Table aria-label="simple table">
               <TableHead>
                 <TableRow>
-                  <TableCell align="left">Latittude</TableCell>
+                  <TableCell align="left">Latitude</TableCell>
                   <TableCell align="left">Longitude</TableCell>
                   <TableCell align="left">Name</TableCell>
                   <TableCell align="left">Area</TableCell>
