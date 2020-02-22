@@ -27,7 +27,7 @@ const sasService = new SASjs({
   pathSASViya: "/SASJobExecution",
   appLoc: "/Public/app",
   serverType: "SASVIYA",
-  debug: true
+  debug: false
 } as SASjsConfig);
 
 export const SASContext = createContext<SASContextProps>({
