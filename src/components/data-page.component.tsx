@@ -42,8 +42,8 @@ const DataPageComponent = () => {
         setIsLoading(true);
         if (sasContext.request) {
           sasContext.request(request).then(res => {
-            if (res && res.springs && res.springs.data) {
-              setSprings(res.springs.data);
+            if (res && res.springs) {
+              setSprings(res.springs);
             }
             setIsLoading(false);
           });
@@ -55,8 +55,8 @@ const DataPageComponent = () => {
 
   useEffect(() => {
     if (sasContext.startupData) {
-      setAreas(sasContext.startupData.areas.data);
-      setSelectedArea(sasContext.startupData.areas.data[0]["AREA"]);
+      setAreas(sasContext.startupData.areas);
+      setSelectedArea(sasContext.startupData.areas[0]["AREA"]);
     }
   }, [sasContext.startupData]);
 
