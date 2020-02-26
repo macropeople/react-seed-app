@@ -116,6 +116,12 @@ const RequestModal = props => {
   const [expanded, setExpanded] = React.useState(false);
   const [currentTab, setTab] = React.useState(0);
 
+  const decodeHtml = encodedString => {
+    const tempElement = document.createElement("textarea");
+    tempElement.innerHTML = encodedString;
+    return tempElement.value;
+  };
+
   const handleChange = panel => (event, isExpanded) => {
     setExpanded(isExpanded ? panel : false);
   };
@@ -196,7 +202,7 @@ const RequestModal = props => {
                       className={classes.expansionDescription}
                     >
                       <Highlight language={"html"}>
-                        {programLog.logFile}
+                        {decodeHtml(programLog.logFile)}
                       </Highlight>
                     </Typography>
                   </div>
@@ -211,7 +217,7 @@ const RequestModal = props => {
                       className={classes.expansionDescription}
                     >
                       <Highlight language={"SAS"}>
-                        {programLog.sourceCode}
+                        {decodeHtml(programLog.sourceCode)}
                       </Highlight>
                     </Typography>
                   </div>
@@ -226,7 +232,7 @@ const RequestModal = props => {
                       className={classes.expansionDescription}
                     >
                       <Highlight language={"SAS"}>
-                        {programLog.generatedCode}
+                        {decodeHtml(programLog.generatedCode)}
                       </Highlight>
                     </Typography>
                   </div>
