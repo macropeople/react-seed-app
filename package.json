@@ -11,8 +11,9 @@
     "react-app-polyfill": "^1.0.3",
     "react-dev-utils": "^9.0.4",
     "react-dom": "^16.9.0",
+    "react-highlight.js": "^1.0.7",
     "react-router-dom": "^5.0.1",
-    "sasjs": "^1.6.2"
+    "sasjs": "^1.6.3"
   },
   "devDependencies": {
     "prettier": "^1.19.1",

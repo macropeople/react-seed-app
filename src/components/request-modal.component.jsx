@@ -12,6 +12,8 @@ import Grid from "@material-ui/core/Grid";
 
 import Tabs from "@material-ui/core/Tabs";
 import Tab from "@material-ui/core/Tab";
+import Highlight from "react-highlight.js";
+import "./syntax-highlighting.css";
 
 const AntTabs = withStyles({
   root: {
@@ -193,7 +195,9 @@ const RequestModal = props => {
                       variant="h5"
                       className={classes.expansionDescription}
                     >
-                      {programLog.logLink}
+                      <Highlight language={"html"}>
+                        {programLog.logFile}
+                      </Highlight>
                     </Typography>
                   </div>
                 ) : (
@@ -206,7 +210,9 @@ const RequestModal = props => {
                       variant="h5"
                       className={classes.expansionDescription}
                     >
-                      {programLog.sourceCode}
+                      <Highlight language={"SAS"}>
+                        {programLog.sourceCode}
+                      </Highlight>
                     </Typography>
                   </div>
                 ) : (
@@ -219,7 +225,9 @@ const RequestModal = props => {
                       variant="h5"
                       className={classes.expansionDescription}
                     >
-                      {programLog.generatedCode}
+                      <Highlight language={"SAS"}>
+                        {programLog.generatedCode}
+                      </Highlight>
                     </Typography>
                   </div>
                 ) : (
