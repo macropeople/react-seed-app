@@ -49,36 +49,22 @@ const SASProvider = ({ children }) => {
   const [startupData, setStartupData] = useState(null);
 
   const fetchStartupData = useCallback(() => {
-    sasService.request("common/appInit", null, true).then((response: any) => {
-      let responseJson;
-      try {
-        responseJson = JSON.parse(response);
-      } catch (e) {
-        console.error(e);
-      }
-      if (responseJson && responseJson.status === 449) {
-        fetchStartupData();
-      } else {
-        setStartupData(responseJson);
-      }
+    sasService.request("common/appInit", null).then((response: any) => {
+      setStartupData(response);
     });
   }, []);
 
   const login = useCallback((userName, password) => {
     return sasService
-      .SASlogin(userName, password)
+      .logIn(userName, password)
       .then(
-        (res: any) => {
-          if (res.search(/success/gim)) {
-            setIsUserLoggedIn(true);
-            return true;
-          } else {
-            setIsUserLoggedIn(false);
-            return false;
-          }
+        (res: { isLoggedIn: boolean; userName: string }) => {
+          setIsUserLoggedIn(res.isLoggedIn);
+          return true;
         },
         err => {
           console.error(err);
+          setIsUserLoggedIn(false);
           return false;
         }
       )
@@ -98,19 +84,11 @@ const SASProvider = ({ children }) => {
 
   const request = useCallback(({ url, data }) => {
     return sasService.request(url, data).then((res: any) => {
-      let jsonResponse;
       if (res.login === false) {
         setIsUserLoggedIn(false);
         return false;
       }
-
-      try {
-        jsonResponse = JSON.parse(res);
-        return jsonResponse;
-      } catch (e) {
-        console.error("Error parsing json: ", e);
-        return false;
-      }
+      return res;
     });
   }, []);
 
