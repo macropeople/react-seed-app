@@ -83,13 +83,21 @@ const SASProvider = ({ children }) => {
   }, []);
 
   const request = useCallback(({ url, data }) => {
-    return sasService.request(url, data).then((res: any) => {
-      if (res.login === false) {
-        setIsUserLoggedIn(false);
-        return false;
-      }
-      return res;
-    });
+    return sasService
+      .request(url, data)
+      .then((res: any) => {
+        if (res.login === false) {
+          setIsUserLoggedIn(false);
+          return false;
+        }
+        return res;
+      })
+      .catch(e => {
+        if (e.message.includes("login required")) {
+          setIsUserLoggedIn(false);
+          return false;
+        }
+      });
   }, []);
 
   useEffect(() => {
