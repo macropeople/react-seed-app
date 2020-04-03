@@ -13,7 +13,7 @@ If you don't have internet access, you'll need to go to that link and copy / pas
 ```
     filename mc url "https://raw.githubusercontent.com/macropeople/macrocore/master/mc_all.sas";
     %inc mc;
-    %let client=new%sysfunc(ranuni(0));
+    %let client=new%sysfunc(ranuni(0),hex16.);
     %let secret=MySecret;
     %mv_getapptoken(client_id=&client,client_secret=&secret)
 ```
@@ -37,18 +37,17 @@ Services can be created programmagically using the code below.
 filename ft15f001 temp;
 parmcards4;
     proc sql;
-    create table areas as select distinct area
-      from sashelp.springs;
+    create table areas as select distinct area from sashelp.springs;
+    %webout(OPEN)
     %webout(OBJ,areas)
     %webout(CLOSE)
 ;;;;
 %mv_createwebservice(path=/Public/myapp/common, name=appInit, code=ft15f001,replace=YES)
-
-filename ft15f001 temp;
 parmcards4;
     proc sql;
     create table springs as select * from sashelp.springs
       where area in (select area from areas);
+    %webout(OPEN)
     %webout(OBJ,springs)
     %webout(CLOSE)
 ;;;;
