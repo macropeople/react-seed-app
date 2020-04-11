@@ -44,6 +44,7 @@ parmcards4;
 ;;;;
 %mv_createwebservice(path=/Public/myapp/common, name=appInit, code=ft15f001,replace=YES)
 parmcards4;
+    %webout(FETCH)
     proc sql;
     create table springs as select * from sashelp.springs
       where area in (select area from areas);
