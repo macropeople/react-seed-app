@@ -39,9 +39,10 @@ If you are running locally you will either need to whitelist `localhost` on the 
 
 ## Supported Versions of SAS
 
-This app will work on SAS Viya, and will also work on SAS 9 with a few tweaks (just set the `serverType` to SAS9 and use the `mm_createwebservice()` macro to define services.
+This app will work on SAS Viya, and will also work on SAS 9 with a few tweaks (just set the `serverType` to SAS9 and use the `mm_createwebservice()` macro to define services).
 
-It will not work on SAS University edition, or local instances of SAS.  A web server, and application server (STP or Compute) is required.
+It will not work on SAS University edition, or local instances of SAS.  A web server, and application server (STP or Compute) is required
+
 
 ### Code Style
 
